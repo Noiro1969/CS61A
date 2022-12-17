@@ -23,6 +23,18 @@ def roll_dice(num_rolls, dice=six_sided):
     assert num_rolls > 0, 'Must roll at least once.'
     # BEGIN PROBLEM 1
     "*** YOUR CODE HERE ***"
+    cnt, score, Flag = 0, 0, False # if any of the dice outcome is a 1, Flag = True
+    while cnt < num_rolls:
+        tmp = dice()
+        if tmp == 1:
+            Flag = True
+        else:
+            score += tmp
+        cnt += 1
+    if Flag:
+        return 1
+    else:
+        return score
     # END PROBLEM 1
 
 
@@ -34,6 +46,7 @@ def tail_points(opponent_score):
     """
     # BEGIN PROBLEM 2
     "*** YOUR CODE HERE ***"
+    return 2 * abs(opponent_score % 10 - (opponent_score // 10) % 10) + 1
     # END PROBLEM 2
 
 
@@ -51,6 +64,10 @@ def take_turn(num_rolls, opponent_score, dice=six_sided):
     assert num_rolls <= 10, 'Cannot roll more than 10 dice.'
     # BEGIN PROBLEM 3
     "*** YOUR CODE HERE ***"
+    if num_rolls == 0:
+        return tail_points(opponent_score)
+    else:
+        return roll_dice(num_rolls, dice)
     # END PROBLEM 3
 
 
@@ -74,6 +91,17 @@ def square_update(num_rolls, player_score, opponent_score, dice=six_sided):
 
 # BEGIN PROBLEM 4
 "*** YOUR CODE HERE ***"
+def perfect_square(score):
+    from math import sqrt
+    if sqrt(score) % 1 == 0:
+        return True
+    else:
+        return False
+
+
+def next_perfect_square(score):
+    from math import sqrt
+    return int(pow(sqrt(score)+1, 2))
 # END PROBLEM 4
 
 
@@ -113,6 +141,17 @@ def play(strategy0, strategy1, update,
     who = 0  # Who is about to take a turn, 0 (first) or 1 (second)
     # BEGIN PROBLEM 5
     "*** YOUR CODE HERE ***"
+    while score0 < goal and score1 < goal:
+        if who == 0:
+            num_rolls = strategy0(score0, score1)
+            score0 = update(num_rolls, score0, score1, dice)
+            # 这里dice funciton不能少写,否则运行ok时会打印不出玩家掷出的点数
+            # Function A在作为Function B的参数时, 如果Function B被调用买,那么Function A会先被执行
+            # 所以如果少了dice参数,则si_sided就作为默认参数而不会执行,所以打印不出掷出的点数
+        if who == 1:
+            num_rolls = strategy1(score1, score0)
+            score1 = update(num_rolls, score1, score0, dice)
+        who = 1 - who
     # END PROBLEM 5
     return score0, score1
 
